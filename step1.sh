@@ -13,3 +13,4 @@ stringtie ${name}_sorted.bam -G ~/ly/map/gwas/annotation/intergenic.gtf -p 5 -o 
 cd ../
 
 done
+# Get a series of GTF file
