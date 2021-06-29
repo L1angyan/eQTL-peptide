@@ -11,3 +11,4 @@ python3 zzz_phenotype.py $name
 
 Rscript normal-quantile-transformation.R
 # Normal quantile transformation, transfrom the phenotype data to normal distribution.
+# Now, I get the phenotype file.
