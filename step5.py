@@ -21,6 +21,21 @@ def parse_ID(i):
     #tpm=l[6].split('"')[1]
     return(ID)
 
+def sort(df):
+    return(df.sort_values("snp_pos"))
+
+def cluster(i):
+    l_list=[]
+    l=[]
+    for k in range(len(i)):
+        diff = i.iloc[k,13]
+        if diff>=0 and diff<=10000:
+            l.append(i.iloc[k,2])
+        else:
+            l=[i.iloc[k,2]]
+        l_list.append(l)
+    return(l_list)
+
 df = pd.read_table("zzz_farmcpu.txt",sep=",",header=None)
 df[8]=peptide(df.iloc[:,7])
 func = lambda x:"peptide_maize" not in x
@@ -34,8 +49,27 @@ gtf = gtf.loc[:,[0,3,4,6,"peptide"]]
 gtf.columns = ["peptide_chr","peptide_pos1","peptide_pos2","peptide_strand","peptide"]
 
 df = pd.merge(df,gtf,on="peptide")
-# df.to_csv("zzz_merge_farmcpu.txt",sep="\t",index=None)
-# Now, I have got a table containing all of the eQTL information.
+#df.to_csv("zzz_merge_farmcpu.txt",sep="\t",index=None)
+df = df.groupby("snp_chr").apply(sort)
+df = df.reset_index(drop=True)
+for i in df["snp_chr"].drop_duplicates():
+    name="df_"+i
+    locals()[name]=df[df["snp_chr"]==i]
+    locals()[name].drop_duplicates(inplace=True)
+    locals()[name]["snp_pos_diff"]=locals()[name]["snp_pos"].diff()
+    #locals()[name].shape
+    #b=locals()[name]["snp_pos"].diff()<10000
+    #locals()[name][b].index
+    locals()[name]["interval"]=cluster(locals()[name])
+    locals()[name].to_csv("zzz_"+name+".txt",sep="\t",index=None)
+    
+# Now, I have get 10+ table file including eQTL information seperated by tab.
+# ll
+#-rw-r--r-- 1 yliang LLi   10177 Jul  4 15:34 zzz_df_1.txt
+#-rw-r--r-- 1 yliang LLi    6443 Jul  4 15:34 zzz_df_2.txt
+#-rw-r--r-- 1 yliang LLi    6659 Jul  4 15:34 zzz_df_3.txt
+#-rw-r--r-- 1 yliang LLi    5851 Jul  4 15:34 zzz_df_4.txt
+
 
 
 
